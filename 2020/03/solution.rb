@@ -6,11 +6,11 @@ class Solution
     @height = @input.length
   end
   
-  def solve_first_part!
+  def solve_first_part
     return count_trees_on_slope(0, 0)
   end
 
-  def solve_second_part!
+  def solve_second_part
     slopes = [
       [1, 1],
       [3, 1],
@@ -28,11 +28,11 @@ class Solution
 
   end
 
-  def solve!
+  def solve
     puts "---Solving Part 1---"
-    puts solve_first_part!
+    puts solve_first_part
     puts "---Solving Part 2---"
-    puts solve_second_part!
+    puts solve_second_part
   end
 
   private
@@ -52,4 +52,4 @@ end
 
 input_file = ARGV[0]
 input = File.readlines(input_file)
-Solution.new(input).solve!
+Solution.new(input).solve

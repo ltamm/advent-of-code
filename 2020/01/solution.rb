@@ -4,7 +4,7 @@ class Solution
     @input = input
   end
   
-  def solve!
+  def solve
     while not @input.empty?
       n = @input.shift
       @input.each do |m|
@@ -20,4 +20,4 @@ end
 
 input_file = ARGV[0]
 input = File.readlines(input_file).map { |n| n.to_i }
-puts Solution.new(input).solve!
+puts Solution.new(input).solve

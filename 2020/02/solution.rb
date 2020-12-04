@@ -4,7 +4,7 @@ class Solution
     @input = input
   end
   
-  def solve_first_part!
+  def solve_first_part
     count = 0
     
     for line in @input
@@ -22,7 +22,7 @@ class Solution
     return count
   end
 
-  def solve_second_part!
+  def solve_second_part
     count = 0
 
     for line in @input
@@ -44,14 +44,14 @@ class Solution
     return count
   end
 
-  def solve!
+  def solve
     puts "---Solving Part 1---"
-    puts solve_first_part!
+    puts solve_first_part
     puts "---Solving Part 2---"
-    puts solve_second_part!
+    puts solve_second_part
   end
 end
 
 input_file = ARGV[0]
 input = File.readlines(input_file)
-Solution.new(input).solve!
+Solution.new(input).solve
