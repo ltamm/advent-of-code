@@ -16,6 +16,9 @@ class Solution
     puts "---Solving Part 2---"
     puts solve_second_part
   end
+
+  private
+  # private functions here
 end
 
 input_file = ARGV[0]
