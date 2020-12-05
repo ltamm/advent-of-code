@@ -10,12 +10,6 @@ class Solution
     'pid',
     'cid'
   ].freeze  
-  
-  REQUIRED_FIELDS2 = {
-    'byr' => proc {|year| year <= 1920 or year >= 2002 },
-    'iyr' => proc {|year| year <= 2010 or year >= 2020 },
-    'eyr' => proc {|year| year <= 2020 or year >= 2030 }
-}.freeze
 
   def initialize(input_file)
     @passports = []
