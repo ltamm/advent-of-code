@@ -7,4 +7,4 @@ mkdir "$base"
 
 # Set up files for solutions input and script
 touch "$base/solve"
-cp solution-template.rb "$base/solution.rb"
+cp solution_template "$base/solution.rb"
