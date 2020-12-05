@@ -10,7 +10,7 @@ class Solution
   def solve_second_part
   end
 
-  def solve!
+  def solve
     puts "---Solving Part 1---"
     puts solve_first_part
     puts "---Solving Part 2---"
