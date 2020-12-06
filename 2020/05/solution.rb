@@ -37,43 +37,13 @@ class Solution
   private
 
   def calculate_seat_id(boarding_pass)
-    row_pattern, col_pattern = boarding_pass.scan(/([FB]{7})([LR]{3})/).first
-    row = binary_search(row_pattern.split(''), 'F', [0, 127])
-    column = binary_search(col_pattern.split(''), 'L', [0, 7])
+    boarding_pass = boarding_pass.gsub(/[FL]/) { '0' }
+    boarding_pass = boarding_pass.gsub(/[BR]/) { '1' }
+    row = boarding_pass[0...7].to_i(2)
+    column = boarding_pass[7..10].to_i(2)
     (row * 8) + column
-  end
-
-  # Pattern: Search sequence, decoded using `key`
-  # Key: This character indicates that the lower range should be searched
-  #      Since the input is clean, any character not equal to this one is
-  #      the one indicating that the upper range should be searched
-  # Range: The range of numbers to be searched
-  # This implementation of the function doesn't do error handling, so will
-  # bork if input is not just like the Advent of Code input :)
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
-  def binary_search(pattern, key, range)
-    if pattern.length == 1
-      return range[0] if pattern[0] == key
-
-      range[1]
-    else
-      if pattern.shift == key
-        # search the lower half
-        min = range[0]
-        # This will be an odd number, but dividing by two results in the floor
-        max = ((range[0] + range[1]) / 2)
-      else
-        # search the upper half
-        # This will be an odd number, but dividing by two results in the floor,
-        #   so add one to get the new min
-        min = ((range[0] + range[1]) / 2) + 1
-        max = range[1]
-      end
-      binary_search(pattern, key, [min, max])
-    end
   end
 end
 
-# rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 input_file = ARGV[0]
 Solution.new(input_file).solve
