@@ -6,29 +6,26 @@ class Solution
   end
 
   def solve_first_part
-    mem = [false] * @input.length
-    cursor = 0
-    acc = 0
-
-    until mem[cursor]
-      mem[cursor] = true
-      instr = @input[cursor].strip
-      op, arg = instr.scan(/(\w+) \+?(-?\d+)/).first
-
-      case op
-        when 'nop'
-          cursor += 1
-        when 'acc'
-          acc += arg.to_i
-          cursor += 1
-        when 'jmp'
-          cursor += arg.to_i
-      end
-    end
-    acc
+    run_program.last
   end
 
   def solve_second_part
+    (0...@input.length).each do |n|
+      instr = @input[n]
+      if instr.include? 'nop'
+        @input[n] = instr.gsub 'nop', 'jmp'
+      elsif instr.include? 'jmp'
+        @input[n] = instr.gsub 'jmp', 'nop'
+      else
+        next
+      end
+      res = run_program
+      return res.last if res.first
+
+      # Put the original instruction back
+      @input[n] = instr
+    end
+    'No solution found :('
   end
 
   def solve
@@ -36,6 +33,36 @@ class Solution
     puts solve_first_part
     puts '---Solving Part 2---'
     puts solve_second_part
+  end
+
+  private
+
+  def run_program
+    mem = [false] * @input.length
+    cursor = 0
+    acc = 0
+    completed = true
+    until cursor == mem.length
+      if mem[cursor]
+        completed = false
+        break
+      end
+
+      mem[cursor] = true
+      instr = @input[cursor].strip
+      op, arg = instr.scan(/(\w+) \+?(-?\d+)/).first
+
+      case op
+      when 'nop'
+        cursor += 1
+      when 'acc'
+        acc += arg.to_i
+        cursor += 1
+      when 'jmp'
+        cursor += arg.to_i
+      end
+    end
+    [completed, acc]
   end
 end
 
