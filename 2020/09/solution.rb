@@ -8,27 +8,42 @@ class Solution
   end
 
   def solve_first_part
-    @invalid_index = -1
+    lower = 0
+    upper = @preamble_length
 
-    (@preamble_length...@input.length).each do |n|
-      num = @input[n]
-      start = n - @preamble_length
-      preamble = @input[start...n]
-      found = false
-      preamble.each do |p|        
-        diff = num - p
+    while upper < @input.length
+      preamble = @input[lower...upper]
+      num = @input[upper]
+      pattern_found = false
+
+      (0...@preamble_length).each do |n|
+        diff = num - preamble[n]
+
+        # super cheesy way of handling the case where
+        # adding the number to itself sums to the 
+        # target value
+        tmp = preamble[n]
+        preamble[n] = -1
         if preamble.include? diff
-          found = true
+          pattern_found = true
           break
         end
+        preamble[n] = tmp
       end
-      # if we reach this point, it doesn't follow the pattern
-      unless found
-        @invalid_index = n
+
+      unless pattern_found
+        @invalid_index = upper
         break
+      else
+        lower += 1
+        upper += 1
       end
     end
-    @input[@invalid_index]
+    if @invalid_index.nil?
+      error()
+    else
+      return @input[@invalid_index]
+    end
   end
 
   def solve_second_part
@@ -48,7 +63,7 @@ class Solution
         upper += 1
       end
     end
-    puts "could not find solution"
+    error()
   end
 
   def solve
@@ -56,6 +71,12 @@ class Solution
     puts solve_first_part
     puts '---Solving Part 2---'
     puts solve_second_part
+  end
+
+  private
+
+  def error
+    "No solution found :("
   end
 end
 
