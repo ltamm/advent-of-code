@@ -4,18 +4,15 @@ class Solution
   def initialize(input)
     # Process input
     @input = File.readlines(input).map { |n| n.strip.to_i }
+    @preamble_length = 25
   end
 
   def solve_first_part
-    preamble_length = 25
     @invalid_index = -1
-    if @input.length <= preamble_length
-      puts "mistakes were made"
-    end
 
-    (preamble_length...@input.length).each do |n|
+    (@preamble_length...@input.length).each do |n|
       num = @input[n]
-      start = n - preamble_length
+      start = n - @preamble_length
       preamble = @input[start...n]
       found = false
       preamble.each do |p|        
@@ -35,6 +32,23 @@ class Solution
   end
 
   def solve_second_part
+    target = @input[@invalid_index]
+    lower = 0
+    upper = 1
+
+    while upper < @input.length
+      sum = @input[lower..upper].sum
+      if sum == target
+        min = @input[lower..upper].min
+        max = @input[lower..upper].max
+        return min + max
+      elsif sum > target
+        lower += 1
+      else
+        upper += 1
+      end
+    end
+    puts "could not find solution"
   end
 
   def solve
