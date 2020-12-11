@@ -13,22 +13,22 @@ class Solution
 
     while upper < @input.length
       preamble = @input[lower...upper]
-      num = @input[upper]
+      target = @input[upper]
       pattern_found = false
 
-      (0...@preamble_length).each do |n|
-        diff = num - preamble[n]
+      preamble.each_with_index do |n, i|
+        diff = target - n
 
         # super cheesy way of handling the case where
         # adding the number to itself sums to the 
         # target value
-        tmp = preamble[n]
-        preamble[n] = -1
+        tmp = n
+        preamble[i] = -1
         if preamble.include? diff
           pattern_found = true
           break
         end
-        preamble[n] = tmp
+        preamble[i] = tmp
       end
 
       unless pattern_found

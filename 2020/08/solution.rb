@@ -10,12 +10,11 @@ class Solution
   end
 
   def solve_second_part
-    (0...@input.length).each do |n|
-      instr = @input[n]
+    @input.each_with_index do |instr, i|
       if instr.include? 'nop'
-        @input[n] = instr.gsub 'nop', 'jmp'
+        @input[i] = instr.gsub 'nop', 'jmp'
       elsif instr.include? 'jmp'
-        @input[n] = instr.gsub 'jmp', 'nop'
+        @input[i] = instr.gsub 'jmp', 'nop'
       else
         next
       end
@@ -23,7 +22,7 @@ class Solution
       return res.last if res.first
 
       # Put the original instruction back
-      @input[n] = instr
+      @input[i] = instr
     end
     'No solution found :('
   end
