@@ -8,14 +8,12 @@ TRANSLATOR = {
   :unoccupied => 'L',
   :floor => '.',
   :occupied => '#'
-}
-
+}.freeze
 
 class WaitingArea
   # seating is a grid of seats
   attr_accessor :seating
-  attr_reader :last_column
-  attr_reader :last_row
+  attr_reader :last_column, :last_row
 
   def initialize(seating)
     @seating = seating
@@ -24,7 +22,7 @@ class WaitingArea
   end
 
   def to_s
-    output = ""
+    output = ''
     @seating.each do |row|
       row.each do |sym|
         output += TRANSLATOR[sym]
@@ -40,7 +38,7 @@ class WaitingArea
     end
   end
 
-  def get_num_occupied
+  def num_occupied
     total = 0
     @seating.each do |row|
       row.each do |column|
@@ -66,24 +64,25 @@ class WaitingArea
       row, column = seat
       swap_state(row, column)
     end
-    return marked_for_swap.size > 0
+    marked_for_swap.size.positive?
   end
 
   def swap_state(row, column)
+    opposite = {
+      unoccupied => :occupied,
+      occupied => :unoccupied
+    }
     state = @seating[row][column]
-    if state == :unoccupied
-      @seating[row][column] = :occupied
-    else 
-      @seating[row][column] = :unoccupied
-    end
+    @seating[row][column] = opposite[state]
   end
 
   def should_swap(row, column)
     state = @seating[row][column]
-    if state == :unoccupied
-      return num_adjacent_occupied(row, column) == 0
-    elsif state == :occupied
-      return num_adjacent_occupied(row, column) >= 4
+    case state
+    when :unoccupied
+      num_adjacent_occupied(row, column).zero?
+    when :occupied
+      num_adjacent_occupied(row, column) >= 4
     else
       false
     end
@@ -121,9 +120,8 @@ end
 
 input_file = ARGV[0]
 rows = File.readlines(input_file).map(&:strip)
-rows.map! { |row| row.split('').map {|seat| TRANSLATOR[seat] } }
+rows.map! { |row| row.split('').map { |seat| TRANSLATOR[seat] } }
 
 a = WaitingArea.new(rows)
 a.cycle!
-puts a.get_num_occupied
-
+puts a.num_occupied
