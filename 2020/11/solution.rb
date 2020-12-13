@@ -21,19 +21,6 @@ class WaitingArea
   attr_accessor :seating
   attr_reader :last_column, :last_row
 
-  class Space
-    attr_reader :x, :y
-
-    def initialize(row, column)
-      @x = row
-      @y = column
-    end
-
-    def state
-      @seating[@x][@y]
-    end
-  end
-
   def initialize(seating)
     @seating = seating
     @last_column = @seating[0].length - 1
