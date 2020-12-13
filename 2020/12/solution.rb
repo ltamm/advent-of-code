@@ -3,8 +3,9 @@
 
 class ShipNav
   def initialize
-    @location = [0, 0]
-    @heading = 90
+    @ship_location = [0, 0]
+    @waypoint_orientation = [10, -1]
+    @waypoint_location = [10, -1]
   end
 
   def execute(program)
@@ -18,7 +19,17 @@ class ShipNav
   private
 
   def manhattan_distance
-    @location[0].abs + @location[1].abs
+    @ship_location[0].abs + @ship_location[1].abs
+  end
+
+  def update_orientation
+    @waypoint_orientation[0] = @waypoint_location[0] - @ship_location[0]
+    @waypoint_orientation[1] = @waypoint_location[1] - @ship_location[1]
+  end
+
+  def reset_waypoint
+    @waypoint_location[0] = @ship_location[0] + @waypoint_orientation[0]
+    @waypoint_location[1] = @ship_location[1] + @waypoint_orientation[1]
   end
 
   # why didn't this work when I set it as a constant?
@@ -26,36 +37,48 @@ class ShipNav
   def instruction_set
     {
       'N' => proc { |n|
-        @location[1] -= n
+        @waypoint_location[1] -= n
+        update_orientation
       },
       'S' => proc { |n|
-        @location[1] += n
+        @waypoint_location[1] += n
+        update_orientation
       },
       'E' => proc { |n|
-        @location[0] += n
+        @waypoint_location[0] += n
+        update_orientation
       },
       'W' => proc { |n|
-        @location[0] -= n
+        @waypoint_location[0] -= n
+        update_orientation
       },
       'L' => proc { |n|
-        @heading += (360 - n)
-        @heading = @heading % 360 if @heading > 360
+        # just rotate in increments of 90
+        while n.positive?
+          way_x = @waypoint_location[0]
+          way_y = @waypoint_location[1]
+          ship_x = @ship_location[0]
+          ship_y = @ship_location[1]
+          @waypoint_location = [-1 * (ship_y - way_y) + ship_x, (ship_x - way_x) + ship_y]
+          n -= 90
+        end
+        update_orientation
       },
       'R' => proc { |n|
-        @heading += n
-        @heading = @heading % 360 if @heading > 360
+        while n.positive?
+          way_x = @waypoint_location[0]
+          way_y = @waypoint_location[1]
+          ship_x = @ship_location[0]
+          ship_y = @ship_location[1]
+          @waypoint_location = [(ship_y - way_y) + ship_x, -1 * (ship_x - way_x) + ship_y]
+          n -= 90
+        end
+        update_orientation
       },
       'F' => proc { |n|
-        case @heading
-        when 360
-          @location[1] -= n
-        when 90
-          @location[0] += n
-        when 180
-          @location[1] += n
-        when 270
-          @location[0] -= n
-        end
+        @ship_location[0] += n * @waypoint_orientation[0]
+        @ship_location[1] += n * @waypoint_orientation[1]
+        reset_waypoint
       }
     }.freeze
   end
