@@ -1,3 +1,4 @@
+#!/usr/bin/ruby
 #!/bin/bash
 set -euo pipefail
 
