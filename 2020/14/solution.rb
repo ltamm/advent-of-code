@@ -39,7 +39,7 @@ class DecoderChipV2 < DecoderChip
 
     # put mask with least significant bits first
     # for ease of iteration
-    little_endian_mask = @mask.split('').reverse
+    little_endian_mask = mask.split('').reverse
     addresses_to_write = [address]
 
     # Iterate over the bits in the mask
