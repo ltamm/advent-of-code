@@ -1,4 +1,3 @@
-#!/usr/bin/ruby
 #!/bin/bash
 set -euo pipefail
 
@@ -7,5 +6,5 @@ base="2020/$DIRNAME"
 mkdir "$base"
 
 # Set up files for solutions input and script
-touch "$base/solve"
+touch "$base/input"
 cp solution_template "$base/solution.rb"
