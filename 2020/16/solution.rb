@@ -13,13 +13,15 @@ class TicketScanner
     end
   end
 
-  # Returns a list of all invalid values found in nearby tickets
+  # Returns a list of the following pairings:
+  #   [invalid ticket, [list of invalid values]]
   def error_scan(nearby_tickets)
-    invalid_values = []
+    invalid_tickets = []
     nearby_tickets.each do |ticket|
-      invalid_values += scan_ticket(ticket)
+      invalid_values = scan_ticket(ticket)
+      invalid_tickets << [ticket, invalid_values] unless invalid_values.empty?
     end
-    invalid_values
+    invalid_tickets
   end
 
   private
@@ -59,38 +61,42 @@ end
 
 # Test Data
 
-# fields = %{\
-# class: 1-3 or 5-7
-# row: 6-11 or 33-44
-# seat: 13-40 or 45-50
-# }
-#my_ticket = '7,1,14'
-#nearby_tickets = File.readlines('test').map(&:strip)
-
-# Actual solution data
 fields = %{\
-departure location: 49-920 or 932-950
-departure station: 28-106 or 130-969
-departure platform: 47-633 or 646-950
-departure track: 41-839 or 851-967
-departure date: 30-71 or 88-966
-departure time: 38-532 or 549-953
-arrival location: 38-326 or 341-968
-arrival station: 27-809 or 834-960
-arrival platform: 29-314 or 322-949
-arrival track: 26-358 or 368-966
-class: 34-647 or 667-951
-duration: 39-771 or 785-958
-price: 43-275 or 286-960
-route: 28-235 or 260-949
-row: 48-373 or 392-962
-seat: 35-147 or 172-953
-train: 37-861 or 885-961
-type: 38-473 or 483-961
-wagon: 49-221 or 228-973
-zone: 46-293 or 307-967
+class: 1-3 or 5-7
+row: 6-11 or 33-44
+seat: 13-40 or 45-50
 }
-nearby_tickets = File.readlines('input').map(&:strip)
-invalid_values = TicketScanner.new(fields).error_scan(nearby_tickets)
+my_ticket = '7,1,14'
+nearby_tickets = File.readlines('test').map(&:strip)
 
-puts "Part 1: #{invalid_values.sum}"
+# Actual Input
+
+# fields = %{\
+# departure location: 49-920 or 932-950
+# departure station: 28-106 or 130-969
+# departure platform: 47-633 or 646-950
+# departure track: 41-839 or 851-967
+# departure date: 30-71 or 88-966
+# departure time: 38-532 or 549-953
+# arrival location: 38-326 or 341-968
+# arrival station: 27-809 or 834-960
+# arrival platform: 29-314 or 322-949
+# arrival track: 26-358 or 368-966
+# class: 34-647 or 667-951
+# duration: 39-771 or 785-958
+# price: 43-275 or 286-960
+# route: 28-235 or 260-949
+# row: 48-373 or 392-962
+# seat: 35-147 or 172-953
+# train: 37-861 or 885-961
+# type: 38-473 or 483-961
+# wagon: 49-221 or 228-973
+# zone: 46-293 or 307-967
+# }
+nearby_tickets = File.readlines('test').map(&:strip)
+invalid_tickets = TicketScanner.new(fields).error_scan(nearby_tickets)
+
+puts "Part 1: #{invalid_tickets.map(&:last).flatten.sum}"
+
+# Remove invalid tickets
+invalid_tickets.map(&:first).each { |t| nearby_tickets.delete(t) }
