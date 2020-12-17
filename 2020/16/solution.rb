@@ -7,7 +7,7 @@ class TicketSniffer
   def initialize(fields)
     # Turn field inputs into validity checks
     @field_checks = {}
-    fields.split("\n").each do |field|
+    fields.each do |field|
       name, ranges = process_fields(field)
       @field_checks[name] = proc { |n| (n >= ranges[0] && n <= ranges[1]) || (n >= ranges[2] && n <= ranges[3]) }
     end
@@ -106,46 +106,30 @@ class TicketSniffer
   end
 end
 
-fields = %{\
-departure location: 49-920 or 932-950
-departure station: 28-106 or 130-969
-departure platform: 47-633 or 646-950
-departure track: 41-839 or 851-967
-departure date: 30-71 or 88-966
-departure time: 38-532 or 549-953
-arrival location: 38-326 or 341-968
-arrival station: 27-809 or 834-960
-arrival platform: 29-314 or 322-949
-arrival track: 26-358 or 368-966
-class: 34-647 or 667-951
-duration: 39-771 or 785-958
-price: 43-275 or 286-960
-route: 28-235 or 260-949
-row: 48-373 or 392-962
-seat: 35-147 or 172-953
-train: 37-861 or 885-961
-type: 38-473 or 483-961
-wagon: 49-221 or 228-973
-zone: 46-293 or 307-967
-}
-my_ticket = '101,179,193,103,53,89,181,139,137,97,61,71,197,59,67,173,199,211,191,131'
-nearby_tickets = File.readlines('input').map(&:strip)
+class Solution
+  def initialize(input)
+    # time for some hacky file processing
+    raw_input = File.read(input).split("\n\n")
+    @fields = raw_input[0].split("\n").map(&:strip)
+    @my_ticket = raw_input[1].split("\n")[1].split(',').map(&:to_i)
+    @nearby_tickets = raw_input[2].split("\n")[1..-1]
+    @sniffer = TicketSniffer.new(@fields)
+  end
 
-sniffer = TicketSniffer.new(fields)
-invalid_tickets = sniffer.error_scan(nearby_tickets)
+  def solve
+    puts '---Solving Part 1---'
+    invalid_tickets = @sniffer.error_scan(@nearby_tickets)
+    puts invalid_tickets.map(&:last).flatten.sum
 
-puts "Part 1: #{invalid_tickets.map(&:last).flatten.sum}"
-
-# Remove invalid tickets
-invalid_tickets.map(&:first).each { |t| nearby_tickets.delete(t) }
-
-ordering = sniffer.deduce_field_order(nearby_tickets)
-departure_indices = ordering.find_all {|k,v| k.start_with? "departure" }.to_h.values
-# use the ordering to find the solution
-ticket = my_ticket.split(',').map(&:to_i)
-solution = 1
-departure_indices.each do |i|
-  solution *= ticket[i]
+    puts '---Solving Part 2---'
+    # Remove invalid tickets
+    invalid_tickets.map(&:first).each { |t| @nearby_tickets.delete(t) }
+    ordering = @sniffer.deduce_field_order(@nearby_tickets)
+    departure_indices = ordering.find_all { |k, _| k.start_with? 'departure' }.to_h.values
+    solution = departure_indices.inject(1) { |product, i| product * @my_ticket[i] }
+    puts solution
+  end
 end
 
-puts "Part 2: #{solution}"
+input_file = ARGV[0]
+Solution.new(input_file).solve
