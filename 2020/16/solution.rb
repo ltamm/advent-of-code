@@ -26,20 +26,15 @@ class TicketSniffer
 
   def deduce_field_order(nearby_tickets)
     fields = field_checks.keys
-    solution_space = {}
-    (0...fields.length).each do |position|
-      val = []
-      fields.each {|f| val << f}
-      solution_space[position] = val
-    end
+    solution_space = initialize_solution_space(fields)
 
     solved = []
     while solved.length < fields.length
       # iterate through tickets
       nearby_tickets.each do |ticket|
         # iterate through numbers in ticket
-        ticket.split(',').map(&:to_i).each_with_index do |value, i|
-          # if that position has not yet been solved
+        ticket.each_with_index do |value, i|
+          # only continue if that position has not yet been solved
           next if solved.include? i
 
           # iterate through the remaining possible fields
@@ -73,6 +68,22 @@ class TicketSniffer
 
   private
 
+  # sets up the solution space for order
+  # deduction
+  #
+  # Solution space begins as a hash mapping
+  # each position to possible candidates (begins
+  # with all candidates in all positions)
+  def initialize_solution_space(fields)
+    solution_space = {}
+    (0...fields.length).each do |position|
+      val = []
+      fields.each { |f| val << f }
+      solution_space[position] = val
+    end
+    solution_space
+  end
+
   # Input: fields in raw input form
   #   e.g. 'class: 0-1 or 4-19'
   # Output:
@@ -91,11 +102,13 @@ class TicketSniffer
     [name, ranges]
   end
 
-  # Returns a list of values that are invalid for any field
-  # in the provided ticket
+  # For a given ticket
+  #   returns a list of the values printed on that ticket that
+  #   do not satisfy the constraints of any field
+  # a non-empty return value means the ticket is no good!
   def scan_ticket(ticket)
     invalid_values = []
-    ticket.split(',').map(&:to_i).each do |val|
+    ticket.each do |val|
       is_valid = false
       field_checks.each_value do |check|
         is_valid ||= check.call(val)
@@ -112,7 +125,7 @@ class Solution
     raw_input = File.read(input).split("\n\n")
     @fields = raw_input[0].split("\n").map(&:strip)
     @my_ticket = raw_input[1].split("\n")[1].split(',').map(&:to_i)
-    @nearby_tickets = raw_input[2].split("\n")[1..-1]
+    @nearby_tickets = raw_input[2].split("\n")[1..-1].map { |ticket| ticket.split(',').map(&:to_i) }
     @sniffer = TicketSniffer.new(@fields)
   end
 
@@ -125,7 +138,11 @@ class Solution
     # Remove invalid tickets
     invalid_tickets.map(&:first).each { |t| @nearby_tickets.delete(t) }
     ordering = @sniffer.deduce_field_order(@nearby_tickets)
+
+    # extract the indices of fields that begin with 'departure'
     departure_indices = ordering.find_all { |k, _| k.start_with? 'departure' }.to_h.values
+
+    # multiply all the departure values together
     solution = departure_indices.inject(1) { |product, i| product * @my_ticket[i] }
     puts solution
   end
